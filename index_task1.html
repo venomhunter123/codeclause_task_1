@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Todo List</title>
+  <style>
+    /* Your CSS styles here */
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      background-color: #f0f0f0;
+    }
+    .container {
+      text-align: center;
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 5px;
+      padding: 20px;
+      width: 300px;
+      margin-bottom: 20px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      text-align: center;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Todo List</h2>
+  <input type="text" id="taskInput" placeholder="Add new task">
+  <input type="date" id="dueDate">
+  <button onclick="addTaskAndUpdateTable()">Add</button>
+  <div>
+    <label>Filter:</label>
+    <select id="filterOptions" onchange="filterTasks()">
+      <option value="all">All</option>
+      <option value="completed">Completed</option>
+      <option value="incomplete">Incomplete</option>
+    </select>
+  </div>
+  <ul id="taskList"></ul>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Task</th>
+      <th>Due Date</th>
+      <th>Status</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody id="taskTable"></tbody>
+</table>
+
+<script>
+  function renderTaskInTable(task) {
+    const tableRow = document.createElement("tr");
+    tableRow.id = task.id; 
+    tableRow.innerHTML = `
+      <td>${task.text}</td>
+      <td>${task.dueDate}</td>
+      <td>${task.completed ? 'Completed' : 'Incomplete'}</td>
+      <td><button onclick="deleteTaskFromTable('${task.id}')">Delete</button></td>
+    `;
+    document.getElementById("taskTable").appendChild(tableRow);
+  }
+
+  function addTaskAndUpdateTable() {
+    const taskInput = document.getElementById("taskInput");
+    const dueDateInput = document.getElementById("dueDate");
+    const taskText = taskInput.value.trim();
+    const dueDate = dueDateInput.value;
+    const filterOption = document.getElementById("filterOptions").value;
+
+    if (taskText !== "") {
+      const newTask = {
+        text: taskText,
+        dueDate: dueDate,
+        completed: filterOption === "completed" ? true : false,
+        id: Date.now().toString()
+      };
+
+      renderTaskInTable(newTask);
+      taskInput.value = "";
+      dueDateInput.value = "";
+      updateFilterOption();
+    } else {
+      alert("Please enter a task!");
+    }
+  }
+
+  function deleteTaskFromTable(taskId) {
+    const taskToRemove = document.getElementById(taskId);
+    taskToRemove.remove();
+    updateFilterOption(); 
+  }
+
+  function filterTasks() {
+    const filterOption = document.getElementById("filterOptions").value;
+    const taskRows = document.getElementById("taskTable").getElementsByTagName("tr");
+
+    for (let row of taskRows) {
+      const statusCell = row.getElementsByTagName("td")[2];
+      const status = statusCell.textContent || statusCell.innerText;
+
+      if (filterOption === "all") {
+        row.style.display = "";
+      } else if ((filterOption === "completed" && status === 'Completed') || (filterOption === "incomplete" && status === 'Incomplete')) {
+        row.style.display = "";
+      } else {
+        row.style.display = "none";
+      }
+    }
+  }
+
+  function updateFilterOption() {
+    const filterOption = document.getElementById("filterOptions").value;
+    const taskRows = document.getElementById("taskTable").getElementsByTagName("tr");
+    let newFilterOption = "all";
+
+    for (let row of taskRows) {
+      const statusCell = row.getElementsByTagName("td")[2];
+      const status = statusCell.textContent || statusCell.innerText;
+
+      if (filterOption === "all" || (filterOption === "completed" && status === 'Completed') || (filterOption === "incomplete" && status === 'Incomplete')) {
+        newFilterOption = filterOption;
+        break;
+      }
+    }
+
+    document.getElementById("filterOptions").value = newFilterOption;
+  }
+</script>
+
+</body>
+</html>
